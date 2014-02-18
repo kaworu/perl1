@@ -15,6 +15,7 @@
 #include "util.h"
 #include "perl.h"
 
+void /* PERL1: defaulting to int will complain about the empty return */
 str_reset(s)
 register char *s;
 {
@@ -181,6 +182,7 @@ register STR *sstr;
 	str_ncat(dstr,sstr->str_ptr,sstr->str_cur);
 }
 
+void /* PERL1: defaulting to int will complain about the empty return */
 str_cat(str,ptr)
 register STR *str;
 register char *ptr;

@@ -61,10 +61,12 @@ typedef struct htbl HASH;
 #include "array.h"
 #include "hash.h"
 
+#if 0 /* PERL1: commented out because sprintf(3) is declared in <stdio.h> */
 #ifdef CHARSPRINTF
     char *sprintf();
 #else
     int sprintf();
+#endif
 #endif
 
 /* A string is TRUE if not "" or "0". */

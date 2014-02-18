@@ -28,7 +28,9 @@ void	prexit();
 char	*get_a_line();
 char	*savestr();
 int	makedir();
+#if 0 /* PERL1: commented out because setenv(3) is declared in <stdlib.h> */
 void	setenv();
+#endif
 int	envix();
 void	notincl();
 char	*getval();

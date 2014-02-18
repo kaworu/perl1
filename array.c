@@ -113,6 +113,7 @@ register ARRAY *ar;
     return retval;
 }
 
+void /* PERL1: defaulting to int will complain about the empty return */
 aunshift(ar,num)
 register ARRAY *ar;
 register int num;

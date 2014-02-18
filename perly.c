@@ -1,3 +1,6 @@
+#include <stdlib.h> /* PERL1: needed for mktemp(3) declaration */
+#include <strings.h> /* PERL1: needed for bcopy(3) declaration */
+
 char rcsid[] = "$Header: perly.c,v 1.0.1.3 88/01/28 10:28:31 root Exp $";
 /*
  * $Log:	perly.c,v $

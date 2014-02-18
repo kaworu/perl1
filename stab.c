@@ -166,6 +166,7 @@ STR *str;
     char *s;
     int i;
     int sighandler();
+    extern int errno; /* PERL1: declaration was missing */
 
     if (stab->stab_flags & SF_VMAGIC) {
 	switch (stab->stab_name[0]) {
