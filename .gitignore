@@ -1,0 +1,11 @@
+*.o
+Makefile
+Makefile.old
+UU/
+all
+config.h
+config.sh
+makedepend
+makedir
+perl
+perl.c
