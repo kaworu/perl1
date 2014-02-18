@@ -81,6 +81,8 @@ union	overhead {
 #define	NBUCKETS 30
 static	union overhead *nextf[NBUCKETS];
 extern	char *sbrk();
+static	findbucket(union overhead *freep, int srchlen); /* PERL1: added forward declaration */
+static	void morecore(register bucket); /* PERL1: added forward declaration */
 
 #ifdef MSTATS
 /*
@@ -159,6 +161,7 @@ malloc(nbytes)
  * Allocate more memory to the indicated bucket.
  */
 static
+void /* PERL1: defaulting to int will complain about the empty return */
 morecore(bucket)
 	register bucket;
 {
@@ -206,6 +209,7 @@ morecore(bucket)
   	}
 }
 
+void /* PERL1: defaulting to int will complain about the empty return */
 free(cp)
 	char *cp;
 {   
