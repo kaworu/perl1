@@ -1,6 +1,6 @@
-This is an attempt to make the original Perl Kit, Version 1.0 to build
-correctly on recent Linux and \*BSD. The original README file shipped with Perl
-has been moved to README.perl.txt.
+This is an attempt to make the original Perl Kit, Version 1.0 to build on
+recent Linux and \*BSD. The original README file shipped with Perl has been
+moved to README.perl.txt.
 
 This project is a remake of https://github.com/rhaamo/perl1. Here we try harder
 not to change the original source code and keep the original build system,
@@ -12,7 +12,7 @@ The building process has three steps:
 
 1. ./Configure (answer all the questions)
 2. make depend (maybe a lot of warnings)
-3. make (expet a lot of warnings)
+3. make (expect a lot of warnings)
 
 On success the last line should be
 
