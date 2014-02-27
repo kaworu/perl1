@@ -48,7 +48,7 @@ Install a Berkley Yacc (for example byacc under Debian) and then modify
 error: conflicting types for 'memcpy' (and a lot of noise)
 ----------------------------------------------------------
 perl.h #define bcopy which means trouble if a header (like good ol'
-<strings.h>) try to declare it.
+`strings.h`) try to declare it.
 
 ### Fix:
 In the *Configure* step add the `-DBCOPY` to additional cc flags:
