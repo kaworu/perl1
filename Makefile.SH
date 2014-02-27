@@ -152,7 +152,7 @@ depend: makedepend
 
 test: perl
 	chmod 755 t/TEST t/base.* t/comp.* t/cmd.* t/io.* t/op.*
-	cd t && (rm -f perl; ln -s ../perl . || ln ../perl .) && TEST
+	cd t && (rm -f perl; ln -s ../perl . || ln ../perl .) && ./TEST
 
 clist:
 	echo $(c) | tr ' ' '\012' >.clist
