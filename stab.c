@@ -10,11 +10,13 @@
  */
 
 #include <signal.h>
+#include <errno.h> /* PERL1: needed for errno declaration */
 #include "handy.h"
 #include "EXTERN.h"
 #include "search.h"
 #include "util.h"
 #include "perl.h"
+
 
 static char *sig_name[] = {
     "",
@@ -70,7 +72,7 @@ STAB *stab;
 {
     register int paren;
     register char *s;
-    extern int errno;
+    /* extern int errno; */ /* PERL1: commented out in favour of <errno.h> */
 
     switch (*stab->stab_name) {
     case '0': case '1': case '2': case '3': case '4':
@@ -166,7 +168,6 @@ STR *str;
     char *s;
     int i;
     int sighandler();
-    extern int errno; /* PERL1: declaration was missing */
 
     if (stab->stab_flags & SF_VMAGIC) {
 	switch (stab->stab_name[0]) {
