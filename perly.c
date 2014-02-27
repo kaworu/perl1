@@ -122,8 +122,9 @@ register char **env;
     if (strEQ(filename,"-"))
 	argv[0] = "";
     if (preprocess) {
+	/* PERL1: we replaced here /bin/sed to /usr/bin/env sed */
 	sprintf(buf, "\
-/bin/sed -e '/^[^#]/b' \
+/usr/bin/env sed -e '/^[^#]/b' \
  -e '/^#[ 	]*include[ 	]/b' \
  -e '/^#[ 	]*define[ 	]/b' \
  -e '/^#[ 	]*if[ 	]/b' \
