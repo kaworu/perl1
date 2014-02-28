@@ -211,7 +211,7 @@ EXT jmp_buf eval_env;
 EXT char *goto_targ INIT(Nullch);	/* cmd_exec gets strange when set */
 
 double atof();
-long time();
+/*long time(); */ /* PERL1: commented out because it conflict with <time.h> on OpenBSD and NetBSD */
 struct tm *gmtime(), *localtime();
 
 #ifdef EUNICE
