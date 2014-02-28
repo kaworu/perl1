@@ -202,20 +202,27 @@ int newlen;
 }
 
 /*VARARGS1*/
-fatal(pat,a1,a2,a3,a4)
-char *pat;
+/*fatal(pat,a1,a2,a3,a4)*/ /* PERL1: use stdarg for fatal() */
+/*char *pat; */            /* PERL1: use stdarg for fatal() */
+#include <stdarg.h>        /* PERL1: use stdarg for fatal() */
+fatal(char *pat,...)       /* PERL1: use stdarg for fatal() */
 {
     extern FILE *e_fp;
     extern char *e_tmpname;
+    va_list ap; /* PERL1: added */
 
     if (in_eval) {
-	sprintf(tokenbuf,pat,a1,a2,a3,a4);
+	va_start(ap, pat); /* PERL1: added */
+	/* sprintf(tokenbuf,pat,a1,a2,a3,a4); */ vsprintf(tokenbuf,pat,ap); /* PERL1: varargs */
+	va_end(ap); /* PERL1: added */
 	str_set(stabent("@",TRUE)->stab_val,tokenbuf);
 	longjmp(eval_env,1);
     }
-    fprintf(stderr,pat,a1,a2,a3,a4);
+    va_start(ap, pat); /* PERL1: added */
+    /* fprintf(stderr,pat,a1,a2,a3,a4); */ vfprintf(stderr,pat,ap); /* PERL1: varargs */
     if (e_fp)
 	UNLINK(e_tmpname);
+    va_end(ap); /* PERL1: added */
     exit(1);
 }
 
