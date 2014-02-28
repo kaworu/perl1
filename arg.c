@@ -1038,7 +1038,8 @@ STR ***retary;
 	    apush(ary,str_make(str_get(hiterval(entry))));
     }
     if (retary) { /* array wanted */
-	sarg = (STR**)saferealloc((char*)sarg,(max+2)*sizeof(STR*));
+	/*sarg = (STR**)saferealloc((char*)sarg,(max+2)*sizeof(STR*));*/ /* PERL1: reallocing cause a double free, because the caller will still hold the "old" value of sarg. We do as do_stat() */
+	sarg = (STR**)safemalloc((max+2)*sizeof(STR*));                  /* PERL1: reallocing cause a double free, because the caller will still hold the "old" value of sarg. We do as do_stat() */
 	sarg[0] = Nullstr;
 	sarg[max+1] = Nullstr;
 	for (i = 1; i <= max; i++)
@@ -1065,7 +1066,8 @@ STR ***retary;
 
     if (retary) { /* array wanted */
 	if (entry) {
-	    sarg = (STR**)saferealloc((char*)sarg,4*sizeof(STR*));
+	    /*sarg = (STR**)saferealloc((char*)sarg,4*sizeof(STR*));*/ /* PERL1: reallocing cause a double free, because the caller will still hold the "old" value of sarg. We do as do_stat() */
+	    sarg = (STR**)safemalloc(4*sizeof(STR*));                  /* PERL1: reallocing cause a double free, because the caller will still hold the "old" value of sarg. We do as do_stat() */
 	    sarg[0] = Nullstr;
 	    sarg[3] = Nullstr;
 	    sarg[1] = mystr = str_make(hiterkey(entry));
@@ -1073,7 +1075,8 @@ STR ***retary;
 	    *retary = sarg;
 	}
 	else {
-	    sarg = (STR**)saferealloc((char*)sarg,2*sizeof(STR*));
+	    /*sarg = (STR**)saferealloc((char*)sarg,2*sizeof(STR*));*/ /* PERL1: reallocing cause a double free, because the caller will still hold the "old" value of sarg. We do as do_stat() */
+	    sarg = (STR**)safemalloc(2*sizeof(STR*));                  /* PERL1: reallocing cause a double free, because the caller will still hold the "old" value of sarg. We do as do_stat() */
 	    sarg[0] = Nullstr;
 	    sarg[1] = retstr = Nullstr;
 	    *retary = sarg;
