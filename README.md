@@ -63,3 +63,27 @@ example on Ubuntu x86\_64 because of their
 
 ### Fix:
 Just figure out where is your system's libc and tell *Configure*.
+
+
+Testing
+=======
+Perl1 comes with some tests, see the **t** directory.
+
+**IMPORTANT**: If you intent to run the tests be sure to build Perl1 with its
+own malloc. Answer `y` to the following question during the *Configure* step:
+
+	Do you wish to attempt to use the malloc that comes with perl? [n]
+
+You can launch the tests from the project's directory with:
+
+	make test
+
+Can't open /etc/termcap.
+------------------------
+Your system doesn't provide a termcap file, but the tests assume that it exist.
+
+### Fix:
+You can either get a termcap file and install it as /etc/termcap, or modify the
+tests to check for another file:
+
+	sed -i -e 's/termcap/fstab/' t/*
