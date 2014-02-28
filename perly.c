@@ -24,7 +24,7 @@ bool assume_p = FALSE;
 bool doswitches = FALSE;
 bool allstabs = FALSE;		/* init all customary symbols in symbol table?*/
 char *filename;
-char *e_tmpname = "/tmp/perl-eXXXXXX";
+char e_tmpname[] = "/tmp/perl-eXXXXXX"; /* PERL1: changed from (char *) to (char[]) because it is modified by mktemp(3) */
 FILE *e_fp = Nullfp;
 ARG *l();
 
