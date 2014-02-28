@@ -209,20 +209,20 @@ fatal(char *pat,...)       /* PERL1: use stdarg for fatal() */
 {
     extern FILE *e_fp;
     extern char *e_tmpname;
-    va_list ap; /* PERL1: added */
+    va_list ap; /* PERL1: use stdarg for fatal() */
 
     if (in_eval) {
-	va_start(ap, pat); /* PERL1: added */
-	/* sprintf(tokenbuf,pat,a1,a2,a3,a4); */ vsprintf(tokenbuf,pat,ap); /* PERL1: varargs */
-	va_end(ap); /* PERL1: added */
+	va_start(ap, pat); /* PERL1: use stdarg for fatal() */
+	/* sprintf(tokenbuf,pat,a1,a2,a3,a4); */ vsprintf(tokenbuf,pat,ap); /* PERL1: use stdarg for fatal() */
+	va_end(ap); /* PERL1: use stdarg for fatal() */
 	str_set(stabent("@",TRUE)->stab_val,tokenbuf);
 	longjmp(eval_env,1);
     }
-    va_start(ap, pat); /* PERL1: added */
-    /* fprintf(stderr,pat,a1,a2,a3,a4); */ vfprintf(stderr,pat,ap); /* PERL1: varargs */
+    va_start(ap, pat); /* PERL1: use stdarg for fatal() */
+    /* fprintf(stderr,pat,a1,a2,a3,a4); */ vfprintf(stderr,pat,ap); /* PERL1: use stdarg for fatal() */
     if (e_fp)
 	UNLINK(e_tmpname);
-    va_end(ap); /* PERL1: added */
+    va_end(ap); /* PERL1: use stdarg for fatal() */
     exit(1);
 }
 
