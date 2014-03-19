@@ -2,9 +2,12 @@ This is an attempt to make the original Perl Kit, Version 1.0 to build on
 recent Linux and \*BSD. The original README file shipped with Perl has been
 moved to README.perl.txt.
 
-This project is a remake of https://github.com/rhaamo/perl1. Here we try harder
-not to change the original source code and keep the original build system,
-since building is half of the fun :)
+This project is a remake of https://github.com/rhaamo/perl1. In this branch
+(**minimal-changes**) we try harder not to modify the original source code and
+keep the original build system, because building is half of the fun :) Source
+changes are limited to pure refactoring to allow building to potentially
+succeed. We keep the bugs and the building issues, because they're part of
+history as much as features.
 
 Building
 ========
@@ -25,8 +28,18 @@ clever were your answers in the *Configure* step. Instead of trying to give
 fixes for every system, here is a list of solutions for the most common errors
 (in order from the most expected to the least).
 
+**IMPORTANT**: If you intent to run the tests or actually use Perl1, be sure to
+build it with its own malloc. Answer `y` to the following question during the
+*Configure* step:
+
+	Do you wish to attempt to use the malloc that comes with perl? [n]
+
+
 undefined reference to \`crypt'
 ------------------------------
+Perl1 use `crypt(3)` which is not in your libc. Nowadays it belongs in libcrypt
+on most systems.
+
 ### Fix:
 At the *Configure* step try to add `-lcrypt` to the additional ld flags:
 
@@ -37,11 +50,11 @@ Edit the Makefile and add `-lcrypt` manually to the **libs** make variable.
 
 perl.y:73.1-5: syntax error, unexpected %type, expecting string or char or identifier
 -------------------------------------------------------------------------------------
-You're using bison as yacc and it doesn't like perl.y.
+Your `yacc(1)` is incompatible with Perl1. It is probably GNU bison.
 
 ### Fix:
 Install a Berkley Yacc (for example byacc under Debian) and then modify
-**Makefile**:
+**Makefile** in order to use it:
 
 	% sed -i.bak -e 's/yacc/byacc/' Makefile
 
@@ -67,14 +80,8 @@ Just figure out where is your system's libc and tell *Configure*.
 
 Testing
 =======
-Perl1 comes with some tests, see the **t** directory.
-
-**IMPORTANT**: If you intent to run the tests be sure to build Perl1 with its
-own malloc. Answer `y` to the following question during the *Configure* step:
-
-	Do you wish to attempt to use the malloc that comes with perl? [n]
-
-You can launch the tests from the project's directory with:
+Perl1 comes with some tests, see the **t** directory. You can launch the tests
+from the project's directory with:
 
 	make test
 
