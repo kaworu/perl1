@@ -5,9 +5,9 @@ moved to README.perl.txt.
 This project is a remake of https://github.com/rhaamo/perl1. In this branch
 (**minimal-changes**) we try harder not to modify the original source code and
 keep the original build system, because building is half of the fun :) Source
-changes are limited to pure refactoring to allow building to potentially
-succeed. We keep the bugs and the building issues, because they're part of
-history as much as features.
+changes are limited to pure refactoring allowing to compile Perl1 successfully.
+We keep the bugs and the building issues, because they're part of history as
+much as features.
 
 Building
 ========
