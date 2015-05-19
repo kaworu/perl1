@@ -37,8 +37,7 @@ build it with its own malloc. Answer `y` to the following question during the
 
 undefined reference to \`crypt'
 ------------------------------
-Perl1 use `crypt(3)` which is not in your libc. Nowadays it belongs in libcrypt
-on most systems.
+Perl1 use `crypt(3)` which is not in your libc, it's probably in `libcrypt`.
 
 ### Fix:
 At the *Configure* step try to add `-lcrypt` to the additional ld flags:
@@ -50,10 +49,10 @@ Edit the Makefile and add `-lcrypt` manually to the **libs** make variable.
 
 perl.y:73.1-5: syntax error, unexpected %type, expecting string or char or identifier
 -------------------------------------------------------------------------------------
-Your `yacc(1)` is incompatible with Perl1. It is probably GNU bison.
+Your `yacc(1)` is incompatible with Perl1, it is probably GNU bison.
 
 ### Fix:
-Install a Berkley Yacc (for example byacc under Debian) and then modify
+Install a Berkley Yacc (for example byacc under Debian) and then edit the
 **Makefile** in order to use it:
 
 	% sed -i.bak -e 's/yacc/byacc/' Makefile
@@ -90,7 +89,7 @@ Can't open /etc/termcap.
 Your system doesn't provide a termcap file, but the tests assume that it exist.
 
 ### Fix:
-You can either get a termcap file and install it as /etc/termcap, or modify the
+You can either get a termcap file and install it as /etc/termcap, or edit the
 tests to check for another file:
 
 	sed -i -e 's/termcap/fstab/' t/*
