@@ -45,7 +45,9 @@ At the *Configure* step try to add `-lcrypt` to the additional ld flags:
 	Any additional ld flags? [none] -lcrypt
 
 If you still get the error, your compiler / linker is picky about flags order.
-Edit the Makefile and add `-lcrypt` manually to the **libs** make variable.
+The `-lcrypt` flag must be added to the **libs** variable in the Makefile:
+
+	 % sed -i.bak -e '/^libs =/ s/$/ -lcrypt/' Makefile
 
 perl.y:73.1-5: error: syntax error, unexpected %type, expecting string or char or identifier
 --------------------------------------------------------------------------------------------
@@ -82,7 +84,7 @@ Testing
 Perl1 comes with some tests, see the **t** directory. You can launch the tests
 from the project's directory with:
 
-	make test
+	% make test
 
 Can't open /etc/termcap.
 ------------------------
@@ -92,4 +94,4 @@ Your system doesn't provide a termcap file, but the tests assume that it exist.
 You can either get a termcap file and install it as /etc/termcap, or edit the
 tests to check for another file:
 
-	sed -i -e 's/termcap/fstab/' t/*
+	% sed -i -e 's/termcap/fstab/' t/*
