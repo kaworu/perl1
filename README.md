@@ -47,8 +47,8 @@ At the *Configure* step try to add `-lcrypt` to the additional ld flags:
 If you still get the error, your compiler / linker is picky about flags order.
 Edit the Makefile and add `-lcrypt` manually to the **libs** make variable.
 
-perl.y:73.1-5: syntax error, unexpected %type, expecting string or char or identifier
--------------------------------------------------------------------------------------
+perl.y:73.1-5: error: syntax error, unexpected %type, expecting string or char or identifier
+--------------------------------------------------------------------------------------------
 Your `yacc(1)` is incompatible with Perl1, it is probably GNU bison.
 
 ### Fix:
