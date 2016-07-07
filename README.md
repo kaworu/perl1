@@ -94,4 +94,4 @@ Your system doesn't provide a termcap file, but the tests assume that it exist.
 You can either get a termcap file and install it as /etc/termcap, or edit the
 tests to check for another file:
 
-	% sed -i -e 's/termcap/fstab/' t/*
+	% sed -i -e 's/termcap/fstab/g' t/*
