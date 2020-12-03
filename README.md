@@ -49,8 +49,8 @@ The `-lcrypt` flag must be added to the **libs** variable in the Makefile:
 
 	 % sed -i.bak -e '/^libs =/ s/$/ -lcrypt/' Makefile
 
-perl.y:73.1-5: error: syntax error, unexpected %type, expecting string or char or identifier
---------------------------------------------------------------------------------------------
+perl.y:73.1-5: error: syntax error, unexpected %type, expecting string or character literal or identifier
+---------------------------------------------------------------------------------------------------------
 Your `yacc(1)` is incompatible with Perl1, it is probably GNU bison.
 
 ### Fix:
