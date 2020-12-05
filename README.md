@@ -1,21 +1,23 @@
-This is an attempt to make the original Perl Kit, Version 1.0 to build on
-recent Linux and \*BSD. The original README file shipped with Perl has been
+This is an attempt to make the original Perl Kit Version 1.0 to build on
+"modern" Linux and BSD. The original README file shipped with Perl has been
 moved to README.perl.txt.
 
-This project is a remake of https://github.com/rhaamo/perl1. In this branch
-(**minimal-changes**) we try harder not to modify the original source code and
-keep the original build system, because building is half of the fun :) Source
-changes are limited to pure refactoring allowing to compile Perl1 successfully.
-We keep the bugs and the building issues, because they're part of history as
-much as features.
+In this branch (**minimal-changes**) we try hard not to modify the original
+source code and keep the original build system, because building is half of the
+fun :) Source changes are limited to pure refactoring allowing to compile Perl1
+successfully. We keep the bugs and the building issues, because they're part
+of history as much as features.
+
+If you're looking for a simpler experience, check out the
+[master](https://github.com/kAworu/perl1/tree/master) branch.
 
 Building
 ========
 The building process has three steps:
 
-1. ./Configure (answer all the questions)
-2. make depend (maybe a lot of warnings)
-3. make (expect a lot of warnings)
+1. `./Configure` (answer all the questions)
+2. `make depend` (maybe a lot of warnings)
+3. `make` (expect a lot of warnings)
 
 On success the last line should be
 
@@ -44,8 +46,9 @@ At the *Configure* step try to add `-lcrypt` to the additional ld flags:
 
 	Any additional ld flags? [none] -lcrypt
 
-If you still get the error, your compiler / linker is picky about flags order.
-The `-lcrypt` flag must be added to the **libs** variable in the Makefile:
+If you still get the same error, your compiler / linker is picky about flags
+order. The `-lcrypt` flag must be added to the **libs** variable in the
+Makefile:
 
 	 % sed -i.bak -e '/^libs =/ s/$/ -lcrypt/' Makefile
 
@@ -81,8 +84,8 @@ Just figure out where is your system's libc and tell *Configure*.
 
 Testing
 =======
-Perl1 comes with some tests, see the **t** directory. You can launch the tests
-from the project's directory with:
+Perl1 comes with some tests, see the t/ directory. You can run the tests from
+the project's directory with:
 
 	% make test
 
