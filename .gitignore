@@ -9,3 +9,4 @@ makedepend
 makedir
 perl
 perl.c
+.vagrant

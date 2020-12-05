@@ -1,0 +1,809 @@
+diff --git a/Makefile b/Makefile
+new file mode 100644
+index 0000000..3f9d5de
+--- /dev/null
++++ b/Makefile
+@@ -0,0 +1,151 @@
++# $Header: Makefile.SH,v 1.0.1.4 88/01/28 10:17:59 root Exp $
++#
++# $Log:	Makefile.SH,v $
++# Revision 1.0.1.4  88/01/28  10:17:59  root
++# patch8: added perldb.man
++# 
++# Revision 1.0.1.3  88/01/26  14:14:52  root
++# Added mallocsrc stuff.
++# 
++# Revision 1.0.1.2  88/01/26  08:46:04  root
++# patch 4: make depend didn't work right if . wasn't in PATH.
++# 
++# Revision 1.0.1.1  88/01/24  03:55:18  root
++# patch 2: remove extra Log lines.
++# 
++# Revision 1.0  87/12/18  16:11:50  root
++# Initial revision
++# 
++
++CC = cc
++bin = /bin
++lib = 
++mansrc = /usr/share/man/man1
++manext = 1
++CFLAGS = -static -no-pie
++LDFLAGS = -static -no-pie
++SMALL = 
++LARGE =  
++mallocsrc = 
++mallocobj = 
++
++libs =  -lm
++
++public = perl perldb
++
++private = 
++
++manpages = perl.man perldb.man
++
++util =
++
++sh = Makefile.SH makedepend.SH
++
++h1 = EXTERN.h INTERN.h arg.h array.h cmd.h config.h form.h handy.h
++h2 = hash.h perl.h search.h spat.h stab.h str.h util.h
++
++h = $(h1) $(h2)
++
++c1 = arg.c array.c cmd.c dump.c form.c hash.c $(mallocsrc)
++c2 = search.c stab.c str.c util.c version.c
++
++c = $(c1) $(c2)
++
++obj1 = arg.o array.o cmd.o dump.o form.o hash.o $(mallocobj)
++obj2 = search.o stab.o str.o util.o version.o
++
++obj = $(obj1) $(obj2)
++
++lintflags = -phbvxac
++
++addedbyconf = Makefile.old bsd eunice filexp loc pdp11 usg v7
++
++# grrr
++SHELL = /bin/sh
++
++.c.o:
++	$(CC) -c $(CFLAGS) $(LARGE) $*.c
++
++all: $(public) $(private) $(util)
++	touch all
++
++perl: $(obj) perl.o
++	$(CC) $(LDFLAGS) $(LARGE) $(obj) perl.o $(libs) -o perl
++
++perl.c: perl.y
++	@ echo Expect 2 shift/reduce errors...
++	yacc perl.y
++	mv y.tab.c perl.c
++
++perl.o: perl.c perly.c perl.h EXTERN.h search.h util.h INTERN.h handy.h
++	$(CC) -c $(CFLAGS) $(LARGE) perl.c
++
++# if a .h file depends on another .h file...
++$(h):
++	touch $@
++
++perl.man: perl.man.1 perl.man.2
++	cat perl.man.1 perl.man.2 >perl.man
++
++install: perl perl.man
++# won't work with csh
++	export PATH || exit 1
++	- mv $(bin)/perl $(bin)/perl.old
++	- if test `pwd` != $(bin); then cp $(public) $(bin); fi
++	cd $(bin); \
++for pub in $(public); do \
++chmod 755 `basename $$pub`; \
++done
++	- test $(bin) = /bin || rm -f /bin/perl
++	- test $(bin) = /bin || ln -s $(bin)/perl /bin || cp $(bin)/perl /bin
++#	chmod 755 makedir
++#	- makedir `filexp $(lib)`
++#	- \
++#if test `pwd` != `filexp $(lib)`; then \
++#cp $(private) `filexp $(lib)`; \
++#fi
++#	cd `filexp $(lib)`; \
++#for priv in $(private); do \
++#chmod 755 `basename $$priv`; \
++#done
++	- if test `pwd` != $(mansrc); then \
++for page in $(manpages); do \
++cp $$page $(mansrc)/`basename $$page .man`.$(manext); \
++done; \
++fi
++
++clean:
++	rm -f *.o
++
++realclean:
++	rm -f perl *.orig */*.orig *.o core $(addedbyconf)
++
++# The following lint has practically everything turned on.  Unfortunately,
++# you have to wade through a lot of mumbo jumbo that can't be suppressed.
++# If the source file has a /*NOSTRICT*/ somewhere, ignore the lint message
++# for that spot.
++
++lint:
++	lint $(lintflags) $(defs) $(c) > perl.fuzz
++
++depend: makedepend
++	./makedepend
++
++test: perl
++	chmod 755 t/TEST t/base.* t/comp.* t/cmd.* t/io.* t/op.*
++	cd t && (rm -f perl; ln -s ../perl . || ln ../perl .) && ./TEST
++
++clist:
++	echo $(c) | tr ' ' '\012' >.clist
++
++hlist:
++	echo $(h) | tr ' ' '\012' >.hlist
++
++shlist:
++	echo $(sh) | tr ' ' '\012' >.shlist
++
++# AUTOMATICALLY GENERATED MAKE DEPENDENCIES--PUT NOTHING BELOW THIS LINE
++$(obj):
++	@ echo "You haven't done a "'"make depend" yet!'; exit 1
++makedepend: makedepend.SH
++	/bin/sh makedepend.SH
+diff --git a/UU/filexp b/UU/filexp
+new file mode 100755
+index 0000000..e1e8320
+--- /dev/null
++++ b/UU/filexp
+@@ -0,0 +1,32 @@
++#!/bin/sh
++: expand filename
++case "$1" in
++ ~/*|~)
++    echo $1 | /bin/sed "s|~|${HOME-$LOGDIR}|"
++    ;;
++ ~*)
++    if test -f /bin/csh; then
++	/bin/csh -f -c "glob $1"
++	echo ""
++    else
++	name=`/usr/bin/expr x$1 : '..\([^/]*\)'`
++	dir=`/bin/sed -n -e "/^${name}:/{s/^[^:]*:[^:]*:[^:]*:[^:]*:[^:]*:\([^:]*\).*"'$'"/\1/" -e p -e q -e '}' </etc/passwd`
++	if test ! -d "$dir"; then
++	    me=`basename $0`
++	    echo "$me: can't locate home directory for: $name" >&2
++	    exit 1
++	fi
++	case "$1" in
++	*/*)
++	    echo $dir/`/usr/bin/expr x$1 : '..[^/]*/\(.*\)'`
++	    ;;
++	*)
++	    echo $dir
++	    ;;
++	esac
++    fi
++    ;;
++*)
++    echo $1
++    ;;
++esac
+diff --git a/UU/myread b/UU/myread
+new file mode 100644
+index 0000000..76bd4e5
+--- /dev/null
++++ b/UU/myread
+@@ -0,0 +1,21 @@
++ans='!'
++while expr "X$ans" : "X!" >/dev/null; do
++    read ans
++    case "$ans" in
++    !)
++	sh
++	echo " "
++	echo -n "$rp "
++	;;
++    !*)
++	set `expr "X$ans" : "X!\(.*\)$"`
++	sh -c "$*"
++	echo " "
++	echo -n "$rp "
++	;;
++    esac
++done
++rp='Your answer:'
++case "$ans" in
++'') ans="$dflt";;
++esac
+diff --git a/config.h b/config.h
+new file mode 100644
+index 0000000..b992f2e
+--- /dev/null
++++ b/config.h
+@@ -0,0 +1,134 @@
++/* config.h
++ * This file was produced by running the config.h.SH script, which
++ * gets its values from config.sh, which is generally produced by
++ * running Configure.
++ *
++ * Feel free to modify any of this as the need arises.  Note, however,
++ * that running config.h.SH again will wipe out any changes you've made.
++ * For a more permanent change edit config.sh and rerun config.h.SH.
++ */
++
++
++/* EUNICE:
++ *	This symbol, if defined, indicates that the program is being compiled
++ *	under the EUNICE package under VMS.  The program will need to handle
++ *	things like files that don't go away the first time you unlink them,
++ *	due to version numbering.  It will also need to compensate for lack
++ *	of a respectable link() command.
++ */
++/* VMS:
++ *	This symbol, if defined, indicates that the program is running under
++ *	VMS.  It is currently only set in conjunction with the EUNICE symbol.
++ */
++#/*undef	EUNICE		/**/
++#/*undef	VMS		/**/
++
++/* CPP:
++ *	This symbol contains the first part of the string which will invoke
++ *	the C preprocessor on the standard input and produce to standard
++ *	output.	 Typical value of "cc -E" or "/lib/cpp".
++ */
++/* CPPMINUS:
++ *	This symbol contains the second part of the string which will invoke
++ *	the C preprocessor on the standard input and produce to standard
++ *	output.  This symbol will have the value "-" if CPP needs a minus
++ *	to specify standard input, otherwise the value is "".
++ */
++#define CPP "cc -E"
++#define CPPMINUS "-"
++
++/* BCOPY:
++ *	This symbol, if defined, indicates that the bcopy routine is available
++ *	to copy blocks of memory.  Otherwise you should probably use memcpy().
++ */
++#define	BCOPY		/**/
++
++/* CHARSPRINTF:
++ *	This symbol is defined if this system declares "char *sprintf()" in
++ *	stdio.h.  The trend seems to be to declare it as "int sprintf()".  It
++ *	is up to the package author to declare sprintf correctly based on the
++ *	symbol.
++ */
++#/*undef	CHARSPRINTF 	/**/
++
++/* index:
++ *	This preprocessor symbol is defined, along with rindex, if the system
++ *	uses the strchr and strrchr routines instead.
++ */
++/* rindex:
++ *	This preprocessor symbol is defined, along with index, if the system
++ *	uses the strchr and strrchr routines instead.
++ */
++#/*undef	index strchr	/* cultural */
++#/*undef	rindex strrchr	/*  differences? */
++
++/* STATBLOCKS:
++ *	This symbol is defined if this system has a stat structure declaring
++ *	st_blksize and st_blocks.
++ */
++#/*undef	STATBLOCKS 	/**/
++
++/* STDSTDIO:
++ *	This symbol is defined if this system has a FILE structure declaring
++ *	_ptr and _cnt in stdio.h.
++ */
++#/*undef	STDSTDIO 	/**/
++
++/* STRUCTCOPY:
++ *	This symbol, if defined, indicates that this C compiler knows how
++ *	to copy structures.  If undefined, you'll need to use a block copy
++ *	routine of some sort instead.
++ */
++#define	STRUCTCOPY	/**/
++
++/* TMINSYS:
++ *	This symbol is defined if this system declares "struct tm" in
++ *	in <sys/time.h> rather than <time.h>.  We can't just say
++ *	-I/usr/include/sys because some systems have both time files, and
++ *	the -I trick gets the wrong one.
++ */
++#/*undef	TMINSYS 	/**/
++
++/* vfork:
++ *	This symbol, if defined, remaps the vfork routine to fork if the
++ *	vfork() routine isn't supported here.
++ */
++#/*undef	vfork fork	/**/
++
++/* VOIDSIG:
++ *	This symbol is defined if this system declares "void (*signal())()" in
++ *	signal.h.  The old way was to declare it as "int (*signal())()".  It
++ *	is up to the package author to declare things correctly based on the
++ *	symbol.
++ */
++#define	VOIDSIG 	/**/
++
++/* STDCHAR:
++ *	This symbol is defined to be the type of char used in stdio.h.
++ *	It has the values "unsigned char" or "char".
++ */
++#define STDCHAR char	/**/
++
++/* VOIDFLAGS:
++ *	This symbol indicates how much support of the void type is given by this
++ *	compiler.  What various bits mean:
++ *
++ *	    1 = supports declaration of void
++ *	    2 = supports arrays of pointers to functions returning void
++ *	    4 = supports comparisons between pointers to void functions and
++ *		    addresses of void functions
++ *
++ *	The package designer should define VOIDUSED to indicate the requirements
++ *	of the package.  This can be done either by #defining VOIDUSED before
++ *	including config.h, or by defining defvoidused in Myinit.U.  If the
++ *	level of void support necessary is not present, defines void to int.
++ */
++#ifndef VOIDUSED
++#define VOIDUSED 7
++#endif
++#define VOIDFLAGS 7
++#if (VOIDFLAGS & VOIDUSED) != VOIDUSED
++#define void int		/* is void to be avoided? */
++#define M_VOID		/* Xenix strikes again */
++#endif
++
+diff --git a/config.sh b/config.sh
+new file mode 100644
+index 0000000..39e9b77
+--- /dev/null
++++ b/config.sh
+@@ -0,0 +1,90 @@
++#!/bin/sh
++# config.sh
++# This file was produced by running the Configure script.
++
++d_eunice='/*undef'
++eunicefix=':'
++define='define'
++loclist='
++expr
++sed
++echo
++cat
++rm
++mv
++cp
++tr
++mkdir
++sort
++uniq
++grep
++'
++expr='/usr/bin/expr'
++sed='/bin/sed'
++echo='/bin/echo'
++cat='/bin/cat'
++rm='/bin/rm'
++mv='/bin/mv'
++cp='/bin/cp'
++tail=''
++tr='/usr/bin/tr'
++mkdir='/bin/mkdir'
++sort='/usr/bin/sort'
++uniq='/usr/bin/uniq'
++grep='/bin/grep'
++trylist='
++test
++egrep
++Mcc
++'
++test='test'
++inews=''
++egrep='/bin/egrep'
++more=''
++pg=''
++Mcc='Mcc'
++vi=''
++mailx=''
++mail=''
++Log='$Log'
++Header='$Header'
++bin='/bin'
++cc='cc'
++contains='grep'
++cpp='cc -E'
++cppminus='-'
++d_bcopy='define'
++d_charsprf='/*undef'
++d_index='/*undef'
++d_statblks='/*undef'
++d_stdstdio='/*undef'
++d_strctcpy='define'
++d_tminsys='/*undef'
++d_vfork='/*undef'
++d_voidsig='define'
++libc='/usr/lib/libc.a'
++libnm=''
++mallocsrc=''
++mallocobj=''
++usemymalloc='n'
++mansrc='/usr/share/man/man1'
++manext='1'
++models='none'
++split=''
++small=''
++medium=''
++large=''
++huge=''
++ccflags='-static -no-pie'
++ldflags='-static -no-pie'
++n='-n'
++c=''
++package='perl'
++spitshell='cat'
++shsharp='true'
++sharpbang='#!'
++startsh='#!/bin/sh'
++stdchar='char'
++voidflags='7'
++defvoidused='7'
++CONFIG=true
+diff --git a/makedepend b/makedepend
+new file mode 100755
+index 0000000..226e3e3
+--- /dev/null
++++ b/makedepend
+@@ -0,0 +1,125 @@
++#!/bin/sh
++# $Header: makedepend.SH,v 1.0 87/12/18 17:54:32 root Exp $
++#
++# $Log:	makedepend.SH,v $
++# Revision 1.0  87/12/18  17:54:32  root
++# Initial revision
++# 
++# 
++
++export PATH || (echo "OOPS, this isn't sh.  Desperation time.  I will feed myself to sh."; sh $0; kill $$)
++
++cat='/bin/cat'
++cp='/bin/cp'
++cpp='cc -E'
++echo='/bin/echo'
++egrep='/bin/egrep'
++expr='/usr/bin/expr'
++mv='/bin/mv'
++rm='/bin/rm'
++sed='/bin/sed'
++sort='/usr/bin/sort'
++test='test'
++tr='/usr/bin/tr'
++uniq='/usr/bin/uniq'
++
++$cat /dev/null >.deptmp
++$rm -f *.c.c c/*.c.c
++if test -f Makefile; then
++    mf=Makefile
++else
++    mf=makefile
++fi
++if test -f $mf; then
++    defrule=`<$mf sed -n		\
++	-e '/^\.c\.o:.*;/{'		\
++	-e    's/\$\*\.c//'		\
++	-e    's/^[^;]*;[	 ]*//p'	\
++	-e    q				\
++	-e '}'				\
++	-e '/^\.c\.o: *$/{'		\
++	-e    N				\
++	-e    's/\$\*\.c//'		\
++	-e    's/^.*\n[	 ]*//p'		\
++	-e    q				\
++	-e '}'`
++fi
++case "$defrule" in
++'') defrule='$(CC) -c $(CFLAGS)' ;;
++esac
++
++make clist || ($echo "Searching for .c files..."; \
++	$echo *.c */*.c | $tr ' ' '\012' | $egrep -v '\*' >.clist)
++for file in `$cat .clist`; do
++# for file in `cat /dev/null`; do
++    case "$file" in
++    *.c) filebase=`basename $file .c` ;;
++    *.y) filebase=`basename $file .c` ;;
++    esac
++    $echo "Finding dependencies for $filebase.o."
++    $sed -n <$file >$file.c \
++	-e "/^${filebase}_init(/q" \
++	-e '/^#/{' \
++	-e 's|/\*.*$||' \
++	-e 's|\\$||' \
++	-e p \
++	-e '}'
++    $cpp -I/usr/local/include -I. -I./h $file.c | \
++    $sed \
++	-e '/^# *[0-9]/!d' \
++	-e 's/^.*"\(.*\)".*$/'$filebase'.o: \1/' \
++	-e 's|: \./|: |' \
++	-e '/<built-in>/d' \
++	-e '/<command.line>/d' \
++	-e 's|\.c\.c|.c|' | \
++    $uniq | $sort | $uniq >> .deptmp
++done
++
++$sed <Makefile >Makefile.new -e '1,/^# AUTOMATICALLY/!d'
++
++make shlist || ($echo "Searching for .SH files..."; \
++	$echo *.SH */*.SH | $tr ' ' '\012' | $egrep -v '\*' >.shlist)
++if $test -s .deptmp; then
++    for file in `cat .shlist`; do
++	$echo `$expr X$file : X\(.*\).SH`: $file config.sh \; \
++	    /bin/sh $file >> .deptmp
++    done
++    $echo "Updating Makefile..."
++    $echo "# If this runs make out of memory, delete /usr/include lines." \
++	>> Makefile.new
++    $sed 's|^\(.*\.o:\) *\(.*/.*\.c\) *$|\1 \2; '"$defrule \2|" .deptmp \
++       >>Makefile.new
++else
++    make hlist || ($echo "Searching for .h files..."; \
++	$echo *.h */*.h | $tr ' ' '\012' | $egrep -v '\*' >.hlist)
++    $echo "You don't seem to have a proper C preprocessor.  Using grep instead."
++    $egrep '^#include ' `cat .clist` `cat .hlist`  >.deptmp
++    $echo "Updating Makefile..."
++    <.clist $sed -n							\
++	-e '/\//{'							\
++	-e   's|^\(.*\)/\(.*\)\.c|\2.o: \1/\2.c; '"$defrule \1/\2.c|p"	\
++	-e   d								\
++	-e '}'								\
++	-e 's|^\(.*\)\.c|\1.o: \1.c|p' >> Makefile.new
++    <.hlist $sed -n 's|\(.*/\)\(.*\)|s= \2= \1\2=|p' >.hsed
++    <.deptmp $sed -n 's|c:#include "\(.*\)".*$|o: \1|p' | \
++       $sed 's|^[^;]*/||' | \
++       $sed -f .hsed >> Makefile.new
++    <.deptmp $sed -n 's|c:#include <\(.*\)>.*$|o: /usr/include/\1|p' \
++       >> Makefile.new
++    <.deptmp $sed -n 's|h:#include "\(.*\)".*$|h: \1|p' | \
++       $sed -f .hsed >> Makefile.new
++    <.deptmp $sed -n 's|h:#include <\(.*\)>.*$|h: /usr/include/\1|p' \
++       >> Makefile.new
++    for file in `$cat .shlist`; do
++	$echo `$expr X$file : X\(.*\).SH`: $file config.sh \; \
++	    /bin/sh $file >> Makefile.new
++    done
++fi
++$rm -f Makefile.old
++$cp Makefile Makefile.old
++$cp Makefile.new Makefile
++$rm Makefile.new
++$echo "# WARNING: Put nothing here or make depend will gobble it up!" >> Makefile
++$rm -f .deptmp `sed 's/\.c/.c.c/' .clist` .shlist .clist .hlist .hsed
++
+diff --git a/makedir b/makedir
+new file mode 100755
+index 0000000..ab76023
+--- /dev/null
++++ b/makedir
+@@ -0,0 +1,58 @@
++#!/bin/sh
++# $Header: makedir.SH,v 1.0 87/12/18 13:05:32 root Exp $
++# 
++# $Log:	makedir.SH,v $
++# Revision 1.0  87/12/18  13:05:32  root
++# Initial revision
++# 
++# Revision 4.3.1.1  85/05/10  11:35:14  lwall
++# Branch for patches.
++# 
++# Revision 4.3  85/05/01  11:42:31  lwall
++# Baseline for release with 4.3bsd.
++# 
++
++export PATH || (echo "OOPS, this isn't sh.  Desperation time.  I will feed myself to sh."; sh $0; kill $$)
++
++case $# in
++  0)
++    /bin/echo "makedir pathname filenameflag"
++    exit 1
++    ;;
++esac
++
++: guarantee one slash before 1st component
++case $1 in
++  /*) ;;
++  *)  set ./$1 $2 ;;
++esac
++
++: strip last component if it is to be a filename
++case X$2 in
++  X1) set `/bin/echo $1 | /bin/sed 's:\(.*\)/[^/]*$:\1:'` ;;
++  *)  set $1 ;;
++esac
++
++: return reasonable status if nothing to be created
++if test -d "$1" ; then
++    exit 0
++fi
++
++list=''
++while true ; do
++    case $1 in
++    */*)
++	list="$1 $list"
++	set `echo $1 | /bin/sed 's:\(.*\)/:\1 :'`
++	;;
++    *)
++	break
++	;;
++    esac
++done
++
++set $list
++
++for dir do
++    /bin/mkdir $dir >/dev/null 2>&1
++done
+diff --git a/t/base.term b/t/base.term
+index 509454f..3991302 100644
+--- a/t/base.term
++++ b/t/base.term
+@@ -32,5 +32,5 @@ if ($x == '1') {print "ok 4\n";} else {print "not ok 4\n";}
+ open(try, "/dev/null") || (die "Can't open /dev/null.");
+ if (<try> eq '') {print "ok 5\n";} else {print "not ok 5\n";}
+ 
+-open(try, "/etc/termcap") || (die "Can't open /etc/termcap.");
++open(try, "/etc/fstab") || (die "Can't open /etc/fstab.");
+ if (<try> ne '') {print "ok 6\n";} else {print "not ok 6\n";}
+diff --git a/t/op.flip b/t/op.flip
+index 6a54b19..aa8d222 100644
+--- a/t/op.flip
++++ b/t/op.flip
+@@ -17,7 +17,7 @@ if ($y eq '12E0123E0') {print "ok 7\n";} else {print "not ok 7\n";}
+ 
+ @a = ('a','b','c','d','e','f','g');
+ 
+-open(of,'/etc/termcap');
++open(of,'/etc/fstab');
+ while (<of>) {
+     (3 .. 5) && $foo .= $_;
+ }
+diff --git a/x2p/Makefile b/x2p/Makefile
+new file mode 100644
+index 0000000..01a4224
+--- /dev/null
++++ b/x2p/Makefile
+@@ -0,0 +1,126 @@
++# $Header: Makefile.SH,v 1.0.1.1 88/01/26 14:15:24 root Exp $
++#
++# $Log:	Makefile.SH,v $
++# Revision 1.0.1.1  88/01/26  14:15:24  root
++# Added mallocsrc stuff.
++# 
++# Revision 1.0  87/12/18  17:50:17  root
++# Initial revision
++# 
++# 
++
++CC = cc
++bin = /bin
++lib = 
++mansrc = /usr/share/man/man1
++manext = 1
++CFLAGS = -static -no-pie -O
++LDFLAGS = -static -no-pie
++SMALL = 
++LARGE =  
++mallocsrc = 
++mallocobj = 
++
++libs =  -lm
++
++public = a2p s2p
++
++private = 
++
++manpages = a2p.man s2p.man
++
++util =
++
++sh = Makefile.SH makedepend.SH
++
++h = EXTERN.h INTERN.h config.h handy.h hash.h a2p.h str.h util.h
++
++c = hash.c $(mallocsrc) str.c util.c walk.c
++
++obj = hash.o $(mallocobj) str.o util.o walk.o
++
++lintflags = -phbvxac
++
++addedbyconf = Makefile.old bsd eunice filexp loc pdp11 usg v7
++
++# grrr
++SHELL = /bin/sh
++
++.c.o:
++	$(CC) -c $(CFLAGS) $(LARGE) $*.c
++
++all: $(public) $(private) $(util)
++	touch all
++
++a2p: $(obj) a2p.o
++	$(CC) $(LDFLAGS) $(LARGE) $(obj) a2p.o $(libs) -o a2p
++
++a2p.c: a2p.y
++	@ echo Expect 107 shift/reduce errors...
++	yacc a2p.y
++	mv y.tab.c a2p.c
++
++a2p.o: a2p.c a2py.c a2p.h EXTERN.h util.h INTERN.h handy.h
++	$(CC) -c $(CFLAGS) $(LARGE) a2p.c
++
++# if a .h file depends on another .h file...
++$(h):
++	touch $@
++install: a2p s2p
++# won't work with csh
++	export PATH || exit 1
++	- mv $(bin)/a2p $(bin)/a2p.old
++	- mv $(bin)/s2p $(bin)/s2p.old
++	- if test `pwd` != $(bin); then cp $(public) $(bin); fi
++	cd $(bin); \
++for pub in $(public); do \
++chmod 755 `basename $$pub`; \
++done
++	- test $(bin) = /bin || rm -f /bin/a2p
++#	chmod 755 makedir
++#	- makedir `filexp $(lib)`
++#	- \
++#if test `pwd` != `filexp $(lib)`; then \
++#cp $(private) `filexp $(lib)`; \
++#fi
++#	cd `filexp $(lib)`; \
++#for priv in $(private); do \
++#chmod 755 `basename $$priv`; \
++#done
++	- if test `pwd` != $(mansrc); then \
++for page in $(manpages); do \
++cp $$page $(mansrc)/`basename $$page .man`.$(manext); \
++done; \
++fi
++
++clean:
++	rm -f *.o
++
++realclean:
++	rm -f a2p *.orig */*.orig *.o core $(addedbyconf)
++
++# The following lint has practically everything turned on.  Unfortunately,
++# you have to wade through a lot of mumbo jumbo that can't be suppressed.
++# If the source file has a /*NOSTRICT*/ somewhere, ignore the lint message
++# for that spot.
++
++lint:
++	lint $(lintflags) $(defs) $(c) > a2p.fuzz
++
++depend: ../makedepend
++	../makedepend
++
++clist:
++	echo $(c) | tr ' ' '\012' >.clist
++
++hlist:
++	echo $(h) | tr ' ' '\012' >.hlist
++
++shlist:
++	echo $(sh) | tr ' ' '\012' >.shlist
++
++# AUTOMATICALLY GENERATED MAKE DEPENDENCIES--PUT NOTHING BELOW THIS LINE
++$(obj):
++	@ echo "You haven't done a "'"make depend" yet!'; exit 1
++makedepend: makedepend.SH
++	/bin/sh makedepend.SH
