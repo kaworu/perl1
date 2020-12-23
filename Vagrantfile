@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
     apk add build-base byacc mandoc
     mkdir -p /usr/src
     cd /usr/src
-    curl -sLO https://github.com/kAworu/perl1/archive/master.zip
+    curl -sLO https://github.com/kaworu/perl1/archive/master.zip
     unzip -q master.zip
     mv perl1-master perl1
     cd /usr/src/perl1

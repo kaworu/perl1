@@ -12,7 +12,7 @@ on:
 
 jobs:
   push_to_registry:
-    if: github.repository == 'kAworu/perl1'
+    if: github.repository == 'kaworu/perl1'
     name: Push Docker image to GitHub Container Registry
     runs-on: ubuntu-latest
     steps:

@@ -8,7 +8,7 @@ RUN make depend
 RUN make all perl.man
 
 FROM alpine:3.12 as runner
-LABEL org.opencontainers.image.source https://github.com/kAworu/perl1
+LABEL org.opencontainers.image.source https://github.com/kaworu/perl1
 
 RUN apk add mandoc
 COPY --from=builder /build/perl   /bin/perl
