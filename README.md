@@ -69,6 +69,13 @@ Install a Berkley Yacc (for example byacc under Debian) and then edit the
 
 	% sed -i.bak -e 's/yacc/byacc/' Makefile
 
+make: yacc: Command not found
+-----------------------------
+You need `yacc(1)` to build Perl1.
+
+### Fix:
+Install a Berkley Yacc (for example byacc under Debian).
+
 error: conflicting types for 'memcpy' (and a lot of noise)
 ----------------------------------------------------------
 perl.h #define bcopy which means trouble if a header (like good ol'
