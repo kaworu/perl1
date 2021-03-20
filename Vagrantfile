@@ -1,5 +1,5 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "generic/alpine312"
+  config.vm.box = "generic/alpine313"
   config.vm.synced_folder ".", "/vagrant"
 
   config.vm.provision "shell", inline: <<-EOF
