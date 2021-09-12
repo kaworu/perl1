@@ -1,4 +1,4 @@
-FROM alpine:3.13.2 as builder
+FROM alpine:3.14.2 as builder
 
 RUN apk add build-base byacc
 COPY . /build
@@ -7,7 +7,7 @@ RUN patch -p1 < alpine-3.12.patch
 RUN make depend
 RUN make all perl.man
 
-FROM alpine:3.13.2 as runner
+FROM alpine:3.14.2 as runner
 LABEL org.opencontainers.image.source https://github.com/kaworu/perl1
 
 RUN apk add mandoc

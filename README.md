@@ -115,13 +115,13 @@ Once inside the VM, you can freely enjoy the Perl Kit experience. The build
 directory is at /usr/src/perl1.
 
 ```console
-alpine312:~$ which perl
+alpine314:~$ which perl
 /bin/perl
-alpine312:~$ perl -v
+alpine314:~$ perl -v
 $Header: perly.c,v 1.0.1.3 88/01/28 10:28:31 root Exp $
 Patch level: 10
-alpine312:~$ sudo make -C /usr/src/perl1 test
-alpine312:~$ man perl
+alpine314:~$ sudo make -C /usr/src/perl1 test
+alpine314:~$ man perl
 ```
 
 Note that /bin/perl in the VM is statically linked. Consequently, if your are
@@ -129,10 +129,10 @@ running linux on x86-64 you can copy /bin/perl from the VM and it should run
 just fine from your host:
 
 ```console
-alpine312:~$ file /bin/perl
+alpine314:~$ file /bin/perl
 /bin/perl: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, with debug_info, not stripped
-alpine312:~$ sudo cp /bin/perl /vagrant/
-alpine312:~$ exit
+alpine314:~$ sudo cp /bin/perl /vagrant/
+alpine314:~$ exit
 $ ./perl -e 'print "Hello from the 21th century!\n";'
 Hello from the 21th century!
 ```

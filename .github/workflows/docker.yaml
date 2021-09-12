@@ -32,4 +32,4 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ghcr.io/kaworu/perl1-alpine-3.13.2,ghcr.io/kaworu/perl1-alpine-3.13,ghcr.io/kaworu/perl1-alpine
+          tags: ghcr.io/kaworu/perl1-alpine-3.14.2,ghcr.io/kaworu/perl1-alpine-3.14,ghcr.io/kaworu/perl1-alpine
