@@ -140,7 +140,7 @@ Hello from the 21th century!
 Docker
 ------
 There is a Perl Kit 1.0 [Docker](https://www.docker.com/) image available at
-[ghcr.io/kaworu/perl1-alpine](ghcr.io/kaworu/perl1-alpine), ideal if you are
+[ghcr.io/kaworu/perl1-alpine](https://ghcr.io/kaworu/perl1-alpine), ideal if you are
 planning to run in The Cloud:
 
 ```console
